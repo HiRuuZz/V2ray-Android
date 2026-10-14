@@ -16,6 +16,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -157,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
 
         connection_mode.setOnClickListener(view -> {
             V2rayController.toggleConnectionMode();
-            connection_mode.setText("Connection mode : " + V2rayConfigs.serviceMode.toString());
+            connection_mode.setText("Connection Mode : " + V2rayConfigs.serviceMode.toString());
         });
 
         updateConnectionStateUI(V2rayController.getConnectionState());
@@ -298,7 +299,14 @@ public class MainActivity extends AppCompatActivity {
 
             LinearLayout card = new LinearLayout(this);
             card.setOrientation(LinearLayout.VERTICAL);
-            card.setBackgroundColor(isSelected ? 0xFF243447 : 0xFF1E1E1E);
+            
+            // Programmatically set rounded corners and background color for cards
+            GradientDrawable cardBg = new GradientDrawable();
+            cardBg.setShape(GradientDrawable.RECTANGLE);
+            cardBg.setCornerRadius(24f); // Rounded corners
+            cardBg.setColor(isSelected ? 0xFF243447 : 0xFF1E1E1E);
+            card.setBackground(cardBg);
+            
             card.setPadding(16, 16, 16, 16);
             LinearLayout.LayoutParams cardParams = new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
@@ -391,7 +399,7 @@ public class MainActivity extends AppCompatActivity {
 
             card.setOnClickListener(v -> {
                 if (V2rayController.getConnectionState() == V2rayConstants.CONNECTION_STATES.CONNECTED) {
-                    Toast.makeText(this, "please stop vpn connection before select another config", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, "please stop vpn connection before you select another config", Toast.LENGTH_LONG).show();
                     status_text.setText("Error: Stop VPN first");
                     return;
                 }
