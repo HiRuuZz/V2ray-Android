@@ -135,12 +135,12 @@ public class MainActivity extends AppCompatActivity {
         });
 
         connected_server_delay.setOnClickListener(view -> {
-            connected_server_delay.setText("delay : measuring...");
+            connected_server_delay.setText("Server Delay : measuring...");
             V2rayController.getConnectedV2rayServerDelay(this, delayResult -> runOnUiThread(() -> {
                 if (delayResult >= 0) {
-                    connected_server_delay.setText("delay : " + delayResult + "ms");
+                    connected_server_delay.setText("Server Delay : " + delayResult + "ms");
                 } else {
-                    connected_server_delay.setText("delay : timeout");
+                    connected_server_delay.setText("Server Delay : timeout");
                 }
             }));
         });
@@ -157,7 +157,7 @@ public class MainActivity extends AppCompatActivity {
 
         connection_mode.setOnClickListener(view -> {
             V2rayController.toggleConnectionMode();
-            connection_mode.setText("connection mode : " + V2rayConfigs.serviceMode.toString());
+            connection_mode.setText("Connection mode : " + V2rayConfigs.serviceMode.toString());
         });
 
         updateConnectionStateUI(V2rayController.getConnectionState());
@@ -166,10 +166,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onReceive(Context context, Intent intent) {
                 runOnUiThread(() -> {
-                    connection_time.setText("time: " + Objects.requireNonNull(intent.getExtras()).getString(SERVICE_DURATION_BROADCAST_EXTRA));
+                    connection_time.setText("Time: " + Objects.requireNonNull(intent.getExtras()).getString(SERVICE_DURATION_BROADCAST_EXTRA));
                     connection_speed.setText(intent.getExtras().getString(SERVICE_UPLOAD_SPEED_BROADCAST_EXTRA) + " | " + intent.getExtras().getString(SERVICE_DOWNLOAD_SPEED_BROADCAST_EXTRA));
-                    connection_traffic.setText("traffic: " + intent.getExtras().getString(SERVICE_UPLOAD_TRAFFIC_BROADCAST_EXTRA) + " | " + intent.getExtras().getString(SERVICE_DOWNLOAD_TRAFFIC_BROADCAST_EXTRA));
-                    connection_mode.setText("connection mode : " + V2rayConfigs.serviceMode.toString());
+                    connection_traffic.setText("Traffic Usage: " + intent.getExtras().getString(SERVICE_UPLOAD_TRAFFIC_BROADCAST_EXTRA) + " | " + intent.getExtras().getString(SERVICE_DOWNLOAD_TRAFFIC_BROADCAST_EXTRA));
+                    connection_mode.setText("Connection mode : " + V2rayConfigs.serviceMode.toString());
                     
                     V2rayConstants.CONNECTION_STATES state = (V2rayConstants.CONNECTION_STATES) intent.getExtras().getSerializable(SERVICE_CONNECTION_STATE_BROADCAST_EXTRA);
                     updateConnectionStateUI(state);
@@ -212,7 +212,7 @@ public class MainActivity extends AppCompatActivity {
             case DISCONNECTED:
                 connection.setText("▶");
                 status_text.setText("Disconnected");
-                connected_server_delay.setText("delay : tap to test");
+                connected_server_delay.setText("Server Delay : Tap to Test");
                 break;
             case CONNECTING:
                 connection.setText("...");
@@ -391,7 +391,7 @@ public class MainActivity extends AppCompatActivity {
 
             card.setOnClickListener(v -> {
                 if (V2rayController.getConnectionState() == V2rayConstants.CONNECTION_STATES.CONNECTED) {
-                    Toast.makeText(this, "please stop vpn connection before you select another config", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, "please stop vpn connection before select another config", Toast.LENGTH_LONG).show();
                     status_text.setText("Error: Stop VPN first");
                     return;
                 }
