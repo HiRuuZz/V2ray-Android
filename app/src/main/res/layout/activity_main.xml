@@ -26,14 +26,18 @@
             android:textSize="18sp"
             android:textStyle="bold" />
 
+        <!-- Add Config Button (+) -->
         <TextView
+            android:id="@+id/btn_add_config"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="8dp"
             android:text="+"
             android:textColor="#00E5FF"
-            android:textSize="22sp"
-            android:textStyle="bold" />
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:clickable="true"
+            android:focusable="true" />
     </LinearLayout>
 
     <!-- Sub Header Tabs -->
@@ -50,21 +54,13 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="All groups"
-            android:textColor="#AAAAAA"
-            android:textSize="13sp"
-            android:layout_marginEnd="24dp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="import sub"
+            android:text="Saved Configs"
             android:textColor="#00E5FF"
             android:textSize="13sp"
             android:textStyle="bold" />
     </LinearLayout>
 
-    <!-- Hidden EditText Box (Required by Java code) -->
+    <!-- Hidden EditText (Required for backend logic) -->
     <EditText
         android:id="@+id/v2ray_config"
         android:layout_width="match_parent"
@@ -74,7 +70,7 @@
         android:textColor="@android:color/transparent"
         android:visibility="gone" />
 
-    <!-- Scrollable Config List & Connected Info Area -->
+    <!-- Main Content Scroll Area -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -100,7 +96,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="CONNECTED SERVER"
+                    android:text="ACTIVE SERVER"
                     android:textColor="#00E5FF"
                     android:textSize="11sp"
                     android:textStyle="bold"
@@ -131,6 +127,7 @@
                         android:textColor="#AAAAAA"
                         android:textSize="12sp" />
 
+                    <!-- Ping Test Button -->
                     <Button
                         android:id="@+id/server_delay"
                         android:layout_width="wrap_content"
@@ -175,7 +172,7 @@
                     android:textSize="11sp" />
             </LinearLayout>
 
-            <!-- Config List Item 1 -->
+            <!-- Config List Display Card -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -187,24 +184,25 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Free-Hutch-Zoom"
+                    android:text="Imported Configuration"
                     android:textColor="#FFFFFF"
                     android:textSize="15sp"
                     android:textStyle="bold" />
 
                 <TextView
+                    android:id="@+id/config_preview_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="168.107.71.*** : 443"
+                    android:layout_marginTop="6dp"
+                    android:text="No config imported yet. Tap '+' to add."
                     android:textColor="#AAAAAA"
                     android:textSize="12sp" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
-                    android:text="VLESS"
+                    android:layout_marginTop="8dp"
+                    android:text="V2RAY / VMESS / VLESS"
                     android:textColor="#FF9800"
                     android:textSize="11sp"
                     android:textStyle="bold" />
@@ -226,12 +224,12 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Not connected"
+            android:text="Status: Ready"
             android:textColor="#888888"
             android:textSize="13sp" />
     </LinearLayout>
 
-    <!-- Bottom-Right Floating Round Connect / Stop Button -->
+    <!-- Bottom-Right Round Connect / Stop Button -->
     <Button
         android:id="@+id/btn_connection"
         android:layout_width="64dp"
@@ -240,9 +238,9 @@
         android:layout_alignParentEnd="true"
         android:layout_marginEnd="20dp"
         android:layout_marginBottom="24dp"
-        android:backgroundTint="#333333"
+        android:backgroundTint="#00E5FF"
         android:text="▶"
-        android:textColor="#FFFFFF"
+        android:textColor="#121212"
         android:textSize="22sp" />
 
     <!-- Core Version Footer -->
