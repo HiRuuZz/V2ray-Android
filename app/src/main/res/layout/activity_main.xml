@@ -60,7 +60,7 @@
             android:textStyle="bold" />
     </LinearLayout>
 
-    <!-- Hidden EditText (Required by backend logic) -->
+    <!-- Hidden EditText -->
     <EditText
         android:id="@+id/v2ray_config"
         android:layout_width="match_parent"
@@ -123,7 +123,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="delay : wait"
+                        android:text="delay : tap to test"
                         android:textColor="#AAAAAA"
                         android:textSize="12sp" />
 
@@ -172,7 +172,6 @@
                     android:textSize="11sp" />
             </LinearLayout>
 
-            <!-- Hidden Preview View to satisfy Java references -->
             <TextView
                 android:id="@+id/config_preview_text"
                 android:layout_width="match_parent"
@@ -221,17 +220,5 @@
         android:text="▶"
         android:textColor="#121212"
         android:textSize="22sp" />
-
-    <!-- Core Version Footer -->
-    <TextView
-        android:id="@+id/core_version"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="4dp"
-        android:text="Xray Core"
-        android:textColor="#444444"
-        android:textSize="9sp" />
 
 </RelativeLayout>
