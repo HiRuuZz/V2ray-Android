@@ -60,7 +60,7 @@
             android:textStyle="bold" />
     </LinearLayout>
 
-    <!-- Hidden EditText -->
+    <!-- Hidden EditText (Required by backend logic) -->
     <EditText
         android:id="@+id/v2ray_config"
         android:layout_width="match_parent"
@@ -171,6 +171,13 @@
                     android:textColor="#888888"
                     android:textSize="11sp" />
             </LinearLayout>
+
+            <!-- Hidden Preview View to satisfy Java references -->
+            <TextView
+                android:id="@+id/config_preview_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone" />
 
             <!-- Container for Dynamic Config List Items -->
             <LinearLayout
