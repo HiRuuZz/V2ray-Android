@@ -7,7 +7,7 @@
     android:id="@+id/main_layout"
     tools:context=".MainActivity">
 
-    <!-- Top Action Bar -->
+    <!-- Top Action Bar with Menu Icon -->
     <LinearLayout
         android:id="@+id/top_bar"
         android:layout_width="match_parent"
@@ -16,6 +16,14 @@
         android:gravity="center_vertical"
         android:paddingHorizontal="16dp"
         android:background="#1E1E1E">
+
+        <ImageView
+            android:id="@+id/btn_menu"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginEnd="16dp"
+            android:src="@android:drawable/ic_menu_sort_by_size"
+            android:contentDescription="Menu" />
 
         <TextView
             android:layout_width="0dp"
