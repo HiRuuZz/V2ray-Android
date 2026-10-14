@@ -24,6 +24,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -44,22 +45,44 @@ import dev.dev7.lib.v2ray.utils.V2rayConstants;
 public class MainActivity extends AppCompatActivity {
 
     private Button connection;
-    private TextView connection_speed, connection_traffic, connection_time, server_delay, connected_server_delay, connection_mode, core_version, btn_add_config, status_text;
+    private TextView connection_speed, connection_traffic, connection_time, server_delay, connected_server_delay, connection_mode, btn_add_config, status_text;
     private EditText v2ray_config;
     private LinearLayout config_list_container;
     private SharedPreferences sharedPreferences;
     private BroadcastReceiver v2rayBroadCastReceiver;
     
     private ArrayList<ConfigItem> configList = new ArrayList<>();
-    private int selectedConfigIndex = -1;
 
     public static class ConfigItem {
         String name;
+        String address;
+        String port;
+        String uuid;
+        String flow;
+        String encryption;
+        String network;
+        String headType;
+        String sni;
         String content;
 
-        public ConfigItem(String name, String content) {
+        public ConfigItem(String name, String address, String port, String uuid, String flow, String encryption, String network, String headType, String sni, String content) {
             this.name = name;
+            this.address = address;
+            this.port = port;
+            this.uuid = uuid;
+            this.flow = flow;
+            this.encryption = encryption;
+            this.network = network;
+            this.headType = headType;
+            this.sni = sni;
             this.content = content;
+        }
+
+        public void updateFullContent() {
+            if (content != null && content.startsWith("vless://")) {
+                // Reconstruct basic vless URI if edited manually
+                this.content = "vless://" + uuid + "@" + address + ":" + port + "?encryption=" + encryption + "&security=" + (sni.isEmpty() ? "none" : "tls") + "&sni=" + sni + "&type=" + network + "#" + name;
+            }
         }
     }
 
@@ -79,19 +102,16 @@ public class MainActivity extends AppCompatActivity {
             connection_mode = findViewById(R.id.connection_mode);
             connected_server_delay = findViewById(R.id.connected_server_delay);
             v2ray_config = findViewById(R.id.v2ray_config);
-            core_version = findViewById(R.id.core_version);
             btn_add_config = findViewById(R.id.btn_add_config);
             status_text = findViewById(R.id.status_text);
             config_list_container = findViewById(R.id.config_list_container);
         }
 
-        core_version.setText(V2rayController.getCoreVersion());
         sharedPreferences = getSharedPreferences("conf_prefs", MODE_PRIVATE);
         
         loadConfigsFromPrefs();
         refreshConfigListUI();
 
-        // Add Config Button Dialog (+)
         btn_add_config.setOnClickListener(v -> showImportOptionsDialog());
 
         // Connect / Disconnect Action Button
@@ -110,10 +130,16 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // Connected server delay check
+        // Connected server delay test (Only updates when tapped)
         connected_server_delay.setOnClickListener(view -> {
             connected_server_delay.setText("delay : measuring...");
-            V2rayController.getConnectedV2rayServerDelay(this, delayResult -> runOnUiThread(() -> connected_server_delay.setText("delay : " + delayResult + "ms")));
+            V2rayController.getConnectedV2rayServerDelay(this, delayResult -> runOnUiThread(() -> {
+                if (delayResult >= 0) {
+                    connected_server_delay.setText("delay : " + delayResult + "ms");
+                } else {
+                    connected_server_delay.setText("delay : timeout");
+                }
+            }));
         });
 
         // Server delay ping test button
@@ -132,7 +158,6 @@ public class MainActivity extends AppCompatActivity {
             connection_mode.setText("connection mode : " + V2rayConfigs.serviceMode.toString());
         });
 
-        // Check connection state when activity launch
         updateConnectionStateUI(V2rayController.getConnectionState());
 
         v2rayBroadCastReceiver = new BroadcastReceiver() {
@@ -162,12 +187,11 @@ public class MainActivity extends AppCompatActivity {
             case CONNECTED:
                 connection.setText("■");
                 status_text.setText("Connected Success");
-                connected_server_delay.callOnClick();
                 break;
             case DISCONNECTED:
                 connection.setText("▶");
                 status_text.setText("Disconnected");
-                connected_server_delay.setText("delay : wait");
+                connected_server_delay.setText("delay : tap to test");
                 break;
             case CONNECTING:
                 connection.setText("...");
@@ -185,13 +209,23 @@ public class MainActivity extends AppCompatActivity {
             JSONArray jsonArray = new JSONArray(jsonStr);
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject obj = jsonArray.getJSONObject(i);
-                configList.add(new ConfigItem(obj.getString("name"), obj.getString("content")));
+                configList.add(new ConfigItem(
+                        obj.optString("name", "Config"),
+                        obj.optString("address", ""),
+                        obj.optString("port", "443"),
+                        obj.optString("uuid", ""),
+                        obj.optString("flow", "none"),
+                        obj.optString("encryption", "none"),
+                        obj.optString("network", "tcp"),
+                        obj.optString("headType", "none"),
+                        obj.optString("sni", ""),
+                        obj.getString("content")
+                ));
             }
         } catch (JSONException e) {
             e.printStackTrace();
         }
         
-        // Load active config if available
         String activeCfg = sharedPreferences.getString("active_config_content", "");
         v2ray_config.setText(activeCfg);
     }
@@ -202,6 +236,14 @@ public class MainActivity extends AppCompatActivity {
             for (ConfigItem item : configList) {
                 JSONObject obj = new JSONObject();
                 obj.put("name", item.name);
+                obj.put("address", item.address);
+                obj.put("port", item.port);
+                obj.put("uuid", item.uuid);
+                obj.put("flow", item.flow);
+                obj.put("encryption", item.encryption);
+                obj.put("network", item.network);
+                obj.put("headType", item.headType);
+                obj.put("sni", item.sni);
                 obj.put("content", item.content);
                 jsonArray.put(obj);
             }
@@ -239,7 +281,6 @@ public class MainActivity extends AppCompatActivity {
             cardParams.setMargins(0, 0, 0, 12);
             card.setLayoutParams(cardParams);
 
-            // Title & Action Buttons Row
             LinearLayout topRow = new LinearLayout(this);
             topRow.setOrientation(LinearLayout.HORIZONTAL);
             topRow.setGravity(Gravity.CENTER_VERTICAL);
@@ -295,18 +336,16 @@ public class MainActivity extends AppCompatActivity {
 
             card.addView(topRow);
 
-            // Snippet Preview
             TextView previewView = new TextView(this);
-            previewView.setText(item.content.length() > 50 ? item.content.substring(0, 50) + "..." : item.content);
+            previewView.setText(item.address.isEmpty() ? (item.content.length() > 40 ? item.content.substring(0, 40) + "..." : item.content) : (item.address + " : " + item.port));
             previewView.setTextColor(0xFFAAAAAA);
             previewView.setTextSize(11);
             previewView.setPadding(0, 6, 0, 0);
             card.addView(previewView);
 
-            // Click card to select config for connection
             card.setOnClickListener(v -> {
                 if (V2rayController.getConnectionState() == V2rayConstants.CONNECTION_STATES.CONNECTED) {
-                    Toast.makeText(this, "Please stop vpn connection before you select another config", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, "please stop vpn connection before you select another config", Toast.LENGTH_LONG).show();
                     status_text.setText("Error: Stop VPN first");
                     return;
                 }
@@ -343,11 +382,36 @@ public class MainActivity extends AppCompatActivity {
                 if (text != null) {
                     String pastedConfig = text.toString().trim();
                     String configName = "Config " + (configList.size() + 1);
-                    configList.add(new ConfigItem(configName, pastedConfig));
+                    
+                    // Simple parsing for vless/vmess
+                    String address = "";
+                    String port = "443";
+                    String uuid = "";
+                    String sni = "";
+                    
+                    try {
+                        if (pastedConfig.startsWith("vless://") || pastedConfig.startsWith("vmess://")) {
+                            int atIdx = pastedConfig.indexOf("@");
+                            int colonIdx = pastedConfig.lastIndexOf(":");
+                            int qIdx = pastedConfig.indexOf("?");
+                            if (atIdx != -1 && colonIdx != -1) {
+                                uuid = pastedConfig.substring(pastedConfig.indexOf("://") + 3, atIdx);
+                                address = pastedConfig.substring(atIdx + 1, colonIdx);
+                                if (qIdx != -1) {
+                                    port = pastedConfig.substring(colonIdx + 1, qIdx);
+                                } else {
+                                    port = pastedConfig.substring(colonIdx + 1);
+                                }
+                            }
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    configList.add(new ConfigItem(configName, address, port, uuid, "none", "none", "tcp", "none", sni, pastedConfig));
                     saveConfigsToPrefs();
                     refreshConfigListUI();
                     
-                    // Auto select if first
                     if (configList.size() == 1) {
                         v2ray_config.setText(pastedConfig);
                         sharedPreferences.edit().putString("active_config_content", pastedConfig).apply();
@@ -366,41 +430,103 @@ public class MainActivity extends AppCompatActivity {
     private void showManualInputDialog(final int editIndex) {
         boolean isEdit = (editIndex != -1);
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(isEdit ? "Edit Configuration" : "Manual Config Input");
+        builder.setTitle(isEdit ? "Configuration file (Edit)" : "Manual Config Input");
 
+        ScrollView scrollView = new ScrollView(this);
         LinearLayout layout = new LinearLayout(this);
         layout.setOrientation(LinearLayout.VERTICAL);
         layout.setPadding(32, 16, 32, 16);
 
+        ConfigItem existing = isEdit ? configList.get(editIndex) : null;
+
         final EditText nameInput = new EditText(this);
-        nameInput.setHint("Config Name (e.g. Hutch Zoom)");
-        if (isEdit) nameInput.setText(configList.get(editIndex).name);
+        nameInput.setHint("remarks (Name)");
+        if (isEdit) nameInput.setText(existing.name);
         layout.addView(nameInput);
 
-        final EditText contentInput = new EditText(this);
-        contentInput.setHint("Paste vmess:// or vless:// link here");
-        contentInput.setMinLines(4);
-        if (isEdit) contentInput.setText(configList.get(editIndex).content);
-        layout.addView(contentInput);
+        final EditText addressInput = new EditText(this);
+        addressInput.setHint("address");
+        if (isEdit) addressInput.setText(existing.address);
+        layout.addView(addressInput);
 
-        builder.setView(layout);
+        final EditText portInput = new EditText(this);
+        portInput.setHint("port");
+        if (isEdit) portInput.setText(existing.port);
+        layout.addView(portInput);
+
+        final EditText uuidInput = new EditText(this);
+        uuidInput.setHint("id (UUID)");
+        if (isEdit) uuidInput.setText(existing.uuid);
+        layout.addView(uuidInput);
+
+        final EditText flowInput = new EditText(this);
+        flowInput.setHint("flow");
+        if (isEdit) flowInput.setText(existing.flow);
+        layout.addView(flowInput);
+
+        final EditText encryptionInput = new EditText(this);
+        encryptionInput.setHint("encryption");
+        if (isEdit) encryptionInput.setText(existing.encryption);
+        layout.addView(encryptionInput);
+
+        final EditText networkInput = new EditText(this);
+        networkInput.setHint("network (e.g. tcp, ws)");
+        if (isEdit) networkInput.setText(existing.network);
+        layout.addView(networkInput);
+
+        final EditText sniInput = new EditText(this);
+        sniInput.setHint("SNI");
+        if (isEdit) sniInput.setText(existing.sni);
+        layout.addView(sniInput);
+
+        final EditText rawContentInput = new EditText(this);
+        rawContentInput.setHint("Full vmess:// or vless:// link / raw config");
+        rawContentInput.setMinLines(3);
+        if (isEdit) rawContentInput.setText(existing.content);
+        layout.addView(rawContentInput);
+
+        scrollView.addView(layout);
+        builder.setView(scrollView);
 
         builder.setPositiveButton("Save", (dialog, which) -> {
             String name = nameInput.getText().toString().trim();
-            String content = contentInput.getText().toString().trim();
-            
+            String address = addressInput.getText().toString().trim();
+            String port = portInput.getText().toString().trim();
+            String uuid = uuidInput.getText().toString().trim();
+            String flow = flowInput.getText().toString().trim();
+            String encryption = encryptionInput.getText().toString().trim();
+            String network = networkInput.getText().toString().trim();
+            String sni = sniInput.getText().toString().trim();
+            String rawContent = rawContentInput.getText().toString().trim();
+
             if (name.isEmpty()) name = "Config " + (configList.size() + 1);
-            
-            if (!content.isEmpty()) {
+            if (port.isEmpty()) port = "443";
+            if (network.isEmpty()) network = "tcp";
+            if (flow.isEmpty()) flow = "none";
+            if (encryption.isEmpty()) encryption = "none";
+
+            if (rawContent.isEmpty() && !address.isEmpty() && !uuid.isEmpty()) {
+                rawContent = "vless://" + uuid + "@" + address + ":" + port + "?encryption=" + encryption + "&security=" + (sni.isEmpty() ? "none" : "tls") + "&sni=" + sni + "&type=" + network + "#" + name;
+            }
+
+            if (!rawContent.isEmpty()) {
                 if (isEdit) {
-                    configList.get(editIndex).name = name;
-                    configList.get(editIndex).content = content;
+                    ConfigItem item = configList.get(editIndex);
+                    item.name = name;
+                    item.address = address;
+                    item.port = port;
+                    item.uuid = uuid;
+                    item.flow = flow;
+                    item.encryption = encryption;
+                    item.network = network;
+                    item.sni = sni;
+                    item.content = rawContent;
                     Toast.makeText(this, "Config Updated!", Toast.LENGTH_SHORT).show();
                 } else {
-                    configList.add(new ConfigItem(name, content));
+                    configList.add(new ConfigItem(name, address, port, uuid, flow, encryption, network, "none", sni, rawContent));
                     if (configList.size() == 1) {
-                        v2ray_config.setText(content);
-                        sharedPreferences.edit().putString("active_config_content", content).apply();
+                        v2ray_config.setText(rawContent);
+                        sharedPreferences.edit().putString("active_config_content", rawContent).apply();
                     }
                     Toast.makeText(this, "Config Added Successfully!", Toast.LENGTH_SHORT).show();
                 }
@@ -408,8 +534,7 @@ public class MainActivity extends AppCompatActivity {
                 refreshConfigListUI();
                 status_text.setText("Ready");
             } else {
-                Toast.makeText(this, "Config content cannot be empty!", Toast.LENGTH_SHORT).show();
-                status_text.setText("Error: Empty content");
+                Toast.makeText(this, "Config content or address/id cannot be empty!", Toast.LENGTH_SHORT).show();
             }
         });
         builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
