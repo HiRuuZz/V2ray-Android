@@ -20,8 +20,10 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Gravity;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -47,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView connection_speed, connection_traffic, connection_time, server_delay, connected_server_delay, connection_mode, btn_add_config, status_text;
     private EditText v2ray_config;
     private LinearLayout config_list_container;
+    private ImageView btn_menu;
     private SharedPreferences sharedPreferences;
     private BroadcastReceiver v2rayBroadCastReceiver;
     
@@ -62,9 +65,10 @@ public class MainActivity extends AppCompatActivity {
         String network;
         String headType;
         String sni;
+        String protocol; // vmess, vless, trojan, etc.
         String content;
 
-        public ConfigItem(String name, String address, String port, String uuid, String flow, String encryption, String network, String headType, String sni, String content) {
+        public ConfigItem(String name, String address, String port, String uuid, String flow, String encryption, String network, String headType, String sni, String protocol, String content) {
             this.name = name;
             this.address = address;
             this.port = port;
@@ -74,12 +78,13 @@ public class MainActivity extends AppCompatActivity {
             this.network = network;
             this.headType = headType;
             this.sni = sni;
+            this.protocol = protocol;
             this.content = content;
         }
 
         public void updateFullContent() {
-            if (content != null && (content.startsWith("vless://") || content.startsWith("vmess://"))) {
-                String prefix = content.startsWith("vless://") ? "vless://" : "vmess://";
+            if (content != null && content.contains("://")) {
+                String prefix = protocol.toLowerCase() + "://";
                 this.content = prefix + uuid + "@" + address + ":" + port + "?encryption=" + encryption + "&security=" + (sni.isEmpty() ? "none" : "tls") + "&sni=" + sni + "&type=" + network + "#" + name;
             }
         }
@@ -104,6 +109,7 @@ public class MainActivity extends AppCompatActivity {
             btn_add_config = findViewById(R.id.btn_add_config);
             status_text = findViewById(R.id.status_text);
             config_list_container = findViewById(R.id.config_list_container);
+            btn_menu = findViewById(R.id.btn_menu);
         }
 
         sharedPreferences = getSharedPreferences("conf_prefs", MODE_PRIVATE);
@@ -112,6 +118,7 @@ public class MainActivity extends AppCompatActivity {
         refreshConfigListUI();
 
         btn_add_config.setOnClickListener(v -> showImportOptionsDialog());
+        btn_menu.setOnClickListener(v -> showSideMenuDialog());
 
         // Connect / Disconnect Action Button
         connection.setOnClickListener(view -> {
@@ -179,6 +186,24 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void showSideMenuDialog() {
+        String[] menuOptions = {"Get Free Config", "About us"};
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Ruu VPN Menu");
+        builder.setItems(menuOptions, (dialog, which) -> {
+            if (which == 0) {
+                Toast.makeText(this, "Get Free Config selected", Toast.LENGTH_SHORT).show();
+            } else if (which == 1) {
+                new AlertDialog.Builder(this)
+                    .setTitle("About us")
+                    .setMessage("Ruu VPN v1.0\nProfessional V2ray Android Client.\nCreated for fast and secure connections.")
+                    .setPositiveButton("OK", null)
+                    .show();
+            }
+        });
+        builder.show();
+    }
+
     private void updateConnectionStateUI(V2rayConstants.CONNECTION_STATES state) {
         switch (state) {
             case CONNECTED:
@@ -216,6 +241,7 @@ public class MainActivity extends AppCompatActivity {
                         obj.optString("network", "tcp"),
                         obj.optString("headType", "none"),
                         obj.optString("sni", ""),
+                        obj.optString("protocol", "VLESS"),
                         obj.getString("content")
                 ));
             }
@@ -241,6 +267,7 @@ public class MainActivity extends AppCompatActivity {
                 obj.put("network", item.network);
                 obj.put("headType", item.headType);
                 obj.put("sni", item.sni);
+                obj.put("protocol", item.protocol);
                 obj.put("content", item.content);
                 jsonArray.put(obj);
             }
@@ -263,13 +290,17 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
+        String activeConfigContent = v2ray_config.getText().toString();
+
         for (int i = 0; i < configList.size(); i++) {
             final int index = i;
             ConfigItem item = configList.get(index);
+            boolean isSelected = item.content.equals(activeConfigContent);
 
             LinearLayout card = new LinearLayout(this);
             card.setOrientation(LinearLayout.VERTICAL);
-            card.setBackgroundColor(0xFF1E1E1E);
+            // Highlight active/selected config card background or border look
+            card.setBackgroundColor(isSelected ? 0xFF243447 : 0xFF1E1E1E);
             card.setPadding(16, 16, 16, 16);
             LinearLayout.LayoutParams cardParams = new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
@@ -284,8 +315,10 @@ public class MainActivity extends AppCompatActivity {
 
             TextView nameView = new TextView(this);
             nameView.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
-            nameView.setText(item.name);
-            nameView.setTextColor(0xFFFFFFFF);
+            // Show a green dot or highlight indicator if selected
+            String displayName = isSelected ? "● " + item.name : item.name;
+            nameView.setText(displayName);
+            nameView.setTextColor(isSelected ? 0xFF00E5FF : 0xFFFFFFFF);
             nameView.setTextSize(15);
             nameView.setTypeface(null, android.graphics.Typeface.BOLD);
             topRow.addView(nameView);
@@ -341,12 +374,28 @@ public class MainActivity extends AppCompatActivity {
 
             card.addView(topRow);
 
+            // Details and Protocol type row
+            LinearLayout infoRow = new LinearLayout(this);
+            infoRow.setOrientation(LinearLayout.HORIZONTAL);
+            infoRow.setGravity(Gravity.CENTER_VERTICAL);
+            infoRow.setPadding(0, 6, 0, 0);
+
             TextView previewView = new TextView(this);
-            previewView.setText(item.address.isEmpty() ? (item.content.length() > 40 ? item.content.substring(0, 40) + "..." : item.content) : (item.address + " : " + item.port));
+            previewView.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
+            previewView.setText(item.address.isEmpty() ? (item.content.length() > 30 ? item.content.substring(0, 30) + "..." : item.content) : (item.address + " : " + item.port));
             previewView.setTextColor(0xFFAAAAAA);
             previewView.setTextSize(11);
-            previewView.setPadding(0, 6, 0, 0);
-            card.addView(previewView);
+            infoRow.addView(previewView);
+
+            // Protocol Type View (VMESS, VLESS, TROJAN, etc.)
+            TextView protocolView = new TextView(this);
+            protocolView.setText(item.protocol.toUpperCase());
+            protocolView.setTextColor(0xFFFF9800);
+            protocolView.setTextSize(11);
+            protocolView.setTypeface(null, android.graphics.Typeface.BOLD);
+            infoRow.addView(protocolView);
+
+            card.addView(infoRow);
 
             card.setOnClickListener(v -> {
                 if (V2rayController.getConnectionState() == V2rayConstants.CONNECTION_STATES.CONNECTED) {
@@ -356,6 +405,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 v2ray_config.setText(item.content);
                 sharedPreferences.edit().putString("active_config_content", item.content).apply();
+                refreshConfigListUI();
                 Toast.makeText(this, "Selected: " + item.name, Toast.LENGTH_SHORT).show();
                 status_text.setText("Ready: " + item.name);
             });
@@ -399,7 +449,7 @@ public class MainActivity extends AppCompatActivity {
         builder.setTitle("Manual Link Input");
 
         final EditText input = new EditText(this);
-        input.setHint("Paste vmess:// or vless:// link here");
+        input.setHint("Paste vmess://, vless:// or trojan:// link here");
         input.setMinLines(4);
         builder.setView(input);
 
@@ -425,15 +475,20 @@ public class MainActivity extends AppCompatActivity {
         String encryption = "none";
         String network = "tcp";
         String sni = "";
+        String protocol = "VLESS";
 
         try {
+            if (rawLink.startsWith("vmess://")) protocol = "VMESS";
+            else if (rawLink.startsWith("vless://")) protocol = "VLESS";
+            else if (rawLink.startsWith("trojan://")) protocol = "TROJAN";
+
             if (rawLink.contains("#")) {
                 int hashIdx = rawLink.indexOf("#");
                 name = java.net.URLDecoder.decode(rawLink.substring(hashIdx + 1), "UTF-8");
                 rawLink = rawLink.substring(0, hashIdx);
             }
 
-            if (rawLink.startsWith("vless://") || rawLink.startsWith("vmess://")) {
+            if (rawLink.contains("://")) {
                 int atIdx = rawLink.indexOf("@");
                 int colonIdx = rawLink.lastIndexOf(":");
                 int qIdx = rawLink.indexOf("?");
@@ -458,7 +513,7 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        ConfigItem newItem = new ConfigItem(name, address, port, uuid, flow, encryption, network, "none", sni, rawLink);
+        ConfigItem newItem = new ConfigItem(name, address, port, uuid, flow, encryption, network, "none", sni, protocol, rawLink);
         newItem.updateFullContent();
 
         configList.add(newItem);
@@ -468,6 +523,7 @@ public class MainActivity extends AppCompatActivity {
         if (configList.size() == 1) {
             v2ray_config.setText(newItem.content);
             sharedPreferences.edit().putString("active_config_content", newItem.content).apply();
+            refreshConfigListUI();
         }
 
         Toast.makeText(this, "Config Imported Successfully!", Toast.LENGTH_SHORT).show();
