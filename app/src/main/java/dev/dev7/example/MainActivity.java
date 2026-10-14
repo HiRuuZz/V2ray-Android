@@ -111,6 +111,12 @@ public class MainActivity extends AppCompatActivity {
             config_list_container = findViewById(R.id.config_list_container);
             btn_menu = findViewById(R.id.btn_menu);
         }
+LinearLayout activeServerCard = findViewById(R.id.active_server_card);
+GradientDrawable activeBg = new GradientDrawable();
+activeBg.setShape(GradientDrawable.RECTANGLE);
+activeBg.setCornerRadius(24f);
+activeBg.setColor(0xFF1E1E1E);
+activeServerCard.setBackground(activeBg);
 
         sharedPreferences = getSharedPreferences("conf_prefs", MODE_PRIVATE);
         
