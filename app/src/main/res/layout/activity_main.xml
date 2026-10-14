@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -8,7 +7,7 @@
     android:id="@+id/main_layout"
     tools:context=".MainActivity">
 
-    <!-- Top Action Bar (Matches Screenshot Style) -->
+    <!-- Top Action Bar -->
     <LinearLayout
         android:id="@+id/top_bar"
         android:layout_width="match_parent"
@@ -18,41 +17,23 @@
         android:paddingHorizontal="16dp"
         android:background="#1E1E1E">
 
-        <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@android:drawable/ic_menu_sort_by_size"
-            android:contentDescription="Menu" />
-
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:layout_marginStart="16dp"
             android:text="Configuration file"
             android:textColor="#FFFFFF"
             android:textSize="18sp"
             android:textStyle="bold" />
 
-        <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_marginEnd="16dp"
-            android:src="@android:drawable/ic_menu_search"
-            android:contentDescription="Search" />
-
-        <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_marginEnd="16dp"
-            android:src="@android:drawable/ic_menu_add"
-            android:contentDescription="Add" />
-
-        <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@android:drawable/ic_menu_more_overflow"
-            android:contentDescription="More" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:text="+"
+            android:textColor="#00E5FF"
+            android:textSize="22sp"
+            android:textStyle="bold" />
     </LinearLayout>
 
     <!-- Sub Header Tabs -->
@@ -83,7 +64,7 @@
             android:textStyle="bold" />
     </LinearLayout>
 
-    <!-- Hidden EditText Box (Required by Java code to avoid crashes) -->
+    <!-- Hidden EditText Box (Required by Java code) -->
     <EditText
         android:id="@+id/v2ray_config"
         android:layout_width="match_parent"
@@ -150,7 +131,6 @@
                         android:textColor="#AAAAAA"
                         android:textSize="12sp" />
 
-                    <!-- Ping Test Button right next to connected server -->
                     <Button
                         android:id="@+id/server_delay"
                         android:layout_width="wrap_content"
@@ -158,8 +138,7 @@
                         android:backgroundTint="#2C2C2C"
                         android:text="Ping Test"
                         android:textColor="#00E5FF"
-                        android:textSize="10sp"
-                        app:cornerRadius="8dp" />
+                        android:textSize="10sp" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -205,107 +184,19 @@
                 android:padding="12dp"
                 android:layout_marginBottom="10dp">
 
-                <LinearLayout
+                <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Free-Hutch-Zoom"
-                        android:textColor="#FFFFFF"
-                        android:textSize="15sp"
-                        android:textStyle="bold" />
-
-                    <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:layout_marginEnd="16dp"
-                        android:src="@android:drawable/ic_menu_share"
-                        android:contentDescription="Share" />
-
-                    <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:layout_marginEnd="16dp"
-                        android:src="@android:drawable/ic_menu_edit"
-                        android:contentDescription="Edit" />
-
-                    <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:src="@android:drawable/ic_menu_delete"
-                        android:contentDescription="Delete" />
-                </LinearLayout>
+                    android:text="Free-Hutch-Zoom"
+                    android:textColor="#FFFFFF"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
                     android:text="168.107.71.*** : 443"
-                    android:textColor="#AAAAAA"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
-                    android:text="VLESS"
-                    android:textColor="#FF9800"
-                    android:textSize="11sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
-
-            <!-- Config List Item 2 -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="#1E1E1E"
-                android:orientation="vertical"
-                android:padding="12dp"
-                android:layout_marginBottom="10dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="DialogFree-pathum"
-                        android:textColor="#FFFFFF"
-                        android:textSize="15sp"
-                        android:textStyle="bold" />
-
-                    <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:layout_marginEnd="16dp"
-                        android:src="@android:drawable/ic_menu_share" />
-
-                    <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:layout_marginEnd="16dp"
-                        android:src="@android:drawable/ic_menu_edit" />
-
-                    <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:src="@android:drawable/ic_menu_delete" />
-                </LinearLayout>
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="168.107.71.*** : 80"
                     android:textColor="#AAAAAA"
                     android:textSize="12sp" />
 
@@ -352,8 +243,7 @@
         android:backgroundTint="#333333"
         android:text="▶"
         android:textColor="#FFFFFF"
-        android:textSize="22sp"
-        app:cornerRadius="32dp" />
+        android:textSize="22sp" />
 
     <!-- Core Version Footer -->
     <TextView
