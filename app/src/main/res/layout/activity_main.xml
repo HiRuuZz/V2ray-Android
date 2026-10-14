@@ -1,63 +1,105 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#0A0E17"
-    android:orientation="vertical"
-    android:padding="16dp"
+    android:background="#121212"
     android:id="@+id/main_layout"
     tools:context=".MainActivity">
 
-    <!-- Top Header -->
+    <!-- Top Action Bar (Matches Screenshot Style) -->
     <LinearLayout
+        android:id="@+id/top_bar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="56dp"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:layout_marginBottom="12dp">
+        android:paddingHorizontal="16dp"
+        android:background="#1E1E1E">
 
-        <LinearLayout
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@android:drawable/ic_menu_sort_by_size"
+            android:contentDescription="Menu" />
+
+        <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="vertical">
+            android:layout_marginStart="16dp"
+            android:text="Configuration file"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:textStyle="bold" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="V-RAY PULSE 2.0"
-                android:textColor="#FFFFFF"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:letterSpacing="0.05" />
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginEnd="16dp"
+            android:src="@android:drawable/ic_menu_search"
+            android:contentDescription="Search" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Dilantha's Cyber Rig"
-                android:textColor="#38BDF8"
-                android:textSize="11sp" />
-        </LinearLayout>
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginEnd="16dp"
+            android:src="@android:drawable/ic_menu_add"
+            android:contentDescription="Add" />
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@android:drawable/ic_menu_more_overflow"
+            android:contentDescription="More" />
+    </LinearLayout>
+
+    <!-- Sub Header Tabs -->
+    <LinearLayout
+        android:id="@+id/sub_header"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_below="@id/top_bar"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="16dp"
+        android:background="#1E1E1E">
 
         <TextView
-            android:id="@+id/core_version"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="#1E293B"
-            android:paddingHorizontal="10dp"
-            android:paddingVertical="5dp"
-            android:text="Xray Core"
-            android:textColor="#38BDF8"
-            android:textSize="11sp"
+            android:text="All groups"
+            android:textColor="#AAAAAA"
+            android:textSize="13sp"
+            android:layout_marginEnd="24dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="import sub"
+            android:textColor="#00E5FF"
+            android:textSize="13sp"
             android:textStyle="bold" />
     </LinearLayout>
 
-    <!-- Scrollable Content -->
+    <!-- Hidden EditText Box (Required by Java code to avoid crashes) -->
+    <EditText
+        android:id="@+id/v2ray_config"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_below="@id/sub_header"
+        android:background="@android:color/transparent"
+        android:textColor="@android:color/transparent"
+        android:visibility="gone" />
+
+    <!-- Scrollable Config List & Connected Info Area -->
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_height="match_parent"
+        android:layout_below="@id/sub_header"
+        android:layout_above="@id/bottom_status_bar"
+        android:padding="16dp"
         android:scrollbars="none">
 
         <LinearLayout
@@ -65,154 +107,264 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- Central Connection Button Area -->
+            <!-- Currently Connected / Active Server Section -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
+                android:background="#1E1E1E"
                 android:orientation="vertical"
-                android:paddingVertical="16dp">
-
-                <Button
-                    android:id="@+id/btn_connection"
-                    android:layout_width="140dp"
-                    android:layout_height="140dp"
-                    android:backgroundTint="#0EA5E9"
-                    android:text="CONNECT"
-                    android:textColor="#FFFFFF"
-                    android:textSize="15sp"
-                    android:textStyle="bold" />
+                android:padding="14dp"
+                android:layout_marginBottom="16dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:text="READY TO CONNECT"
-                    android:textColor="#64748B"
-                    android:textSize="12sp"
-                    android:textStyle="bold"
-                    android:letterSpacing="0.1" />
-            </LinearLayout>
-
-            <!-- Configuration & Server Card -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="#131B2E"
-                android:orientation="vertical"
-                android:padding="14dp"
-                android:layout_marginBottom="12dp">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="V2ray Configuration"
-                    android:textColor="#38BDF8"
-                    android:textSize="12sp"
+                    android:text="CONNECTED SERVER"
+                    android:textColor="#00E5FF"
+                    android:textSize="11sp"
                     android:textStyle="bold"
                     android:layout_marginBottom="6dp" />
-
-                <EditText
-                    android:id="@+id/v2ray_config"
-                    android:layout_width="match_parent"
-                    android:layout_height="90dp"
-                    android:background="#0A0E17"
-                    android:gravity="top"
-                    android:hint="v2ray config goes here..."
-                    android:padding="8dp"
-                    android:textColor="#F8FAFC"
-                    android:textColorHint="#64748B"
-                    android:textSize="11sp" />
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginVertical="10dp"
-                    android:background="#1E293B" />
 
                 <TextView
                     android:id="@+id/connection_mode"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingVertical="3dp"
                     android:text="connection mode : VPN_TUN"
-                    android:textColor="#CBD5E1"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:id="@+id/server_delay"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingVertical="3dp"
-                    android:text="server delay : tap to test"
-                    android:textColor="#CBD5E1"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:id="@+id/connected_server_delay"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingVertical="3dp"
-                    android:text="connected server delay : wait"
-                    android:textColor="#CBD5E1"
-                    android:textSize="12sp" />
-            </LinearLayout>
-
-            <!-- Live Network Telemetry Card -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="#131B2E"
-                android:orientation="vertical"
-                android:padding="14dp"
-                android:layout_marginBottom="8dp">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="LIVE NETWORK TELEMETRY"
-                    android:textColor="#38BDF8"
-                    android:textSize="12sp"
-                    android:textStyle="bold"
-                    android:layout_marginBottom="8dp" />
+                    android:textColor="#FFFFFF"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:layout_marginBottom="8dp">
+                    android:layout_marginTop="8dp"
+                    android:gravity="center_vertical">
 
                     <TextView
-                        android:id="@+id/connection_speed"
+                        android:id="@+id/connected_server_delay"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Speed: 0 B/s | 0 B/s"
-                        android:textColor="#38BDF8"
-                        android:textSize="12sp"
-                        android:textStyle="bold" />
+                        android:text="connected server delay : wait"
+                        android:textColor="#AAAAAA"
+                        android:textSize="12sp" />
+
+                    <!-- Ping Test Button right next to connected server -->
+                    <Button
+                        android:id="@+id/server_delay"
+                        android:layout_width="wrap_content"
+                        android:layout_height="32dp"
+                        android:backgroundTint="#2C2C2C"
+                        android:text="Ping Test"
+                        android:textColor="#00E5FF"
+                        android:textSize="10sp"
+                        app:cornerRadius="8dp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="8dp">
 
                     <TextView
                         android:id="@+id/connection_duration"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="time: 00:00:00"
+                        android:textColor="#FFFFFF"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/connection_speed"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Time: 00:00:00"
-                        android:textColor="#38BDF8"
-                        android:textSize="12sp"
-                        android:textStyle="bold" />
+                        android:text="0 B/s | 0 B/s"
+                        android:textColor="#00E5FF"
+                        android:textSize="12sp" />
                 </LinearLayout>
 
                 <TextView
                     android:id="@+id/connection_traffic"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Traffic: 0 B | 0 B"
-                    android:textColor="#94A3B8"
+                    android:layout_marginTop="4dp"
+                    android:text="traffic: 0 B | 0 B"
+                    android:textColor="#888888"
                     android:textSize="11sp" />
+            </LinearLayout>
 
+            <!-- Config List Item 1 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#1E1E1E"
+                android:orientation="vertical"
+                android:padding="12dp"
+                android:layout_marginBottom="10dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Free-Hutch-Zoom"
+                        android:textColor="#FFFFFF"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginEnd="16dp"
+                        android:src="@android:drawable/ic_menu_share"
+                        android:contentDescription="Share" />
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginEnd="16dp"
+                        android:src="@android:drawable/ic_menu_edit"
+                        android:contentDescription="Edit" />
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@android:drawable/ic_menu_delete"
+                        android:contentDescription="Delete" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="168.107.71.*** : 443"
+                    android:textColor="#AAAAAA"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="VLESS"
+                    android:textColor="#FF9800"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- Config List Item 2 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#1E1E1E"
+                android:orientation="vertical"
+                android:padding="12dp"
+                android:layout_marginBottom="10dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="DialogFree-pathum"
+                        android:textColor="#FFFFFF"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginEnd="16dp"
+                        android:src="@android:drawable/ic_menu_share" />
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginEnd="16dp"
+                        android:src="@android:drawable/ic_menu_edit" />
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@android:drawable/ic_menu_delete" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="168.107.71.*** : 80"
+                    android:textColor="#AAAAAA"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="VLESS"
+                    android:textColor="#FF9800"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
             </LinearLayout>
 
         </LinearLayout>
     </ScrollView>
 
-</LinearLayout>
+    <!-- Bottom Status Bar -->
+    <LinearLayout
+        android:id="@+id/bottom_status_bar"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_alignParentBottom="true"
+        android:background="#1E1E1E"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="16dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Not connected"
+            android:textColor="#888888"
+            android:textSize="13sp" />
+    </LinearLayout>
+
+    <!-- Bottom-Right Floating Round Connect / Stop Button -->
+    <Button
+        android:id="@+id/btn_connection"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="24dp"
+        android:backgroundTint="#333333"
+        android:text="▶"
+        android:textColor="#FFFFFF"
+        android:textSize="22sp"
+        app:cornerRadius="32dp" />
+
+    <!-- Core Version Footer -->
+    <TextView
+        android:id="@+id/core_version"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="4dp"
+        android:text="Xray Core"
+        android:textColor="#444444"
+        android:textSize="9sp" />
+
+</RelativeLayout>
