@@ -1,111 +1,153 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginHorizontal="10dp"
+    android:background="#0F172A"
     android:orientation="vertical"
+    android:padding="16sDp"
     android:id="@+id/main_layout"
     tools:context=".MainActivity">
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:text="V2ray Config :"
-        android:textSize="14sp" />
-
-    <EditText
-        android:id="@+id/v2ray_config"
+    <!-- Top Header / Config Section -->
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="4dp"
         android:layout_weight="1"
-        android:background="@android:drawable/dialog_holo_dark_frame"
-        android:gravity="top"
-        android:hint="v2ray config goes here"
-        android:textSize="12sp" />
+        android:layout_marginBottom="12dp"
+        app:cardBackgroundColor="#1E293B"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="0dp">
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="12dp">
 
-    <LinearLayout
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="V2ray Configuration"
+                android:textColor="#38BDF8"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/v2ray_config"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="8dp"
+                android:background="@android:color/transparent"
+                android:gravity="top"
+                android:hint="Paste your v2ray config here..."
+                android:textColor="#F8FAFC"
+                android:textColorHint="#64748B"
+                android:textSize="13sp" />
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+    <!-- Stats Card Grid / Layout -->
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_marginBottom="16dp"
+        app:cardBackgroundColor="#1E293B"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="0dp">
 
-        <TextView
-            android:id="@+id/connection_mode"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginVertical="8dp"
-            android:text="connection mode : VPN_TUN"
-            android:textSize="14sp"
-            android:textStyle="bold" />
+            android:orientation="vertical"
+            android:padding="16dp">
 
-        <TextView
-            android:id="@+id/server_delay"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginVertical="8dp"
-            android:text="server delay : tap to test"
-            android:textSize="14sp"
-            android:textStyle="bold" />
+            <TextView
+                android:id="@+id/connection_mode"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingVertical="4dp"
+                android:text="connection mode : VPN_TUN"
+                android:textColor="#CBD5E1"
+                android:textSize="13sp" />
 
+            <TextView
+                android:id="@+id/server_delay"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingVertical="4dp"
+                android:text="server delay : tap to test"
+                android:textColor="#CBD5E1"
+                android:textSize="13sp" />
 
-        <TextView
-            android:id="@+id/connected_server_delay"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginVertical="8dp"
-            android:text="connected server delay : wait for connection"
-            android:textSize="14sp"
-            android:textStyle="bold" />
+            <TextView
+                android:id="@+id/connected_server_delay"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingVertical="4dp"
+                android:text="connected server delay : wait"
+                android:textColor="#CBD5E1"
+                android:textSize="13sp" />
 
-        <TextView
-            android:id="@+id/connection_duration"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginVertical="8dp"
-            android:text="connection time : 00:00:00"
-            android:textSize="14sp"
-            android:textStyle="bold" />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginVertical="8dp"
+                android:background="#334155" />
 
+            <TextView
+                android:id="@+id/connection_duration"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingVertical="4dp"
+                android:text="connection time : 00:00:00"
+                android:textColor="#38BDF8"
+                android:textSize="13sp"
+                android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/connection_speed"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginVertical="8dp"
-            android:text="connection speed : 0 B/s | 0 B/s"
-            android:textSize="14sp"
-            android:textStyle="bold" />
+            <TextView
+                android:id="@+id/connection_speed"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingVertical="4dp"
+                android:text="connection speed : 0 B/s | 0 B/s"
+                android:textColor="#38BDF8"
+                android:textSize="13sp" />
 
-        <TextView
-            android:id="@+id/connection_traffic"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginVertical="8dp"
-            android:text="connection traffic : 0 B | 0 B"
-            android:textSize="14sp"
-            android:textStyle="bold" />
+            <TextView
+                android:id="@+id/connection_traffic"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingVertical="4dp"
+                android:text="connection traffic : 0 B | 0 B"
+                android:textColor="#38BDF8"
+                android:textSize="13sp" />
 
-    </LinearLayout>
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
 
+    <!-- Connect / Disconnect Action Button -->
     <Button
         android:id="@+id/btn_connection"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
+        android:layout_height="56dp"
+        android:backgroundTint="#0EA5E9"
         android:text="DISCONNECTED"
-        android:textSize="14sp"
-        android:textStyle="bold" />
+        android:textColor="#FFFFFF"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        app:cornerRadius="16dp" />
 
+    <!-- Core Version Footer -->
     <TextView
         android:id="@+id/core_version"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
+        android:layout_marginTop="12dp"
         android:gravity="center"
-        android:text="Xray Core 1.8"
-        android:textColor="@color/white"
-        android:textSize="10sp" />
+        android:text="Xray Core"
+        android:textColor="#64748B"
+        android:textSize="11sp" />
+
 </LinearLayout>
