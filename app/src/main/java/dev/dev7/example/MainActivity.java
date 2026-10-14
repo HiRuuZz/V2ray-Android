@@ -10,6 +10,8 @@ import static dev.dev7.lib.v2ray.utils.V2rayConstants.V2RAY_SERVICE_STATICS_BROA
 
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -17,10 +19,13 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.Objects;
@@ -32,7 +37,7 @@ import dev.dev7.lib.v2ray.utils.V2rayConstants;
 public class MainActivity extends AppCompatActivity {
 
     private Button connection;
-    private TextView connection_speed, connection_traffic, connection_time, server_delay, connected_server_delay, connection_mode,core_version;
+    private TextView connection_speed, connection_traffic, connection_time, server_delay, connected_server_delay, connection_mode, core_version, btn_add_config, config_preview_text;
     private EditText v2ray_config;
     private SharedPreferences sharedPreferences;
     private BroadcastReceiver v2rayBroadCastReceiver;
@@ -42,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        
         if (savedInstanceState == null) {
             V2rayController.init(this, R.drawable.ic_launcher, "V2ray Android");
             connection = findViewById(R.id.btn_connection);
@@ -53,33 +59,54 @@ public class MainActivity extends AppCompatActivity {
             connected_server_delay = findViewById(R.id.connected_server_delay);
             v2ray_config = findViewById(R.id.v2ray_config);
             core_version = findViewById(R.id.core_version);
+            btn_add_config = findViewById(R.id.btn_add_config);
+            config_preview_text = findViewById(R.id.config_preview_text);
         }
 
         core_version.setText(V2rayController.getCoreVersion());
-        // initialize shared preferences for save or reload default config
+        
+        // initialize shared preferences
         sharedPreferences = getSharedPreferences("conf", MODE_PRIVATE);
-        // reload previous config to edit text
-        v2ray_config.setText(sharedPreferences.getString("v2ray_config", getDefaultConfig()));
+        String savedConfig = sharedPreferences.getString("v2ray_config", getDefaultConfig());
+        v2ray_config.setText(savedConfig);
+        
+        if (!savedConfig.isEmpty()) {
+            config_preview_text.setText(savedConfig.length() > 40 ? savedConfig.substring(0, 40) + "..." : savedConfig);
+        }
+
+        // Add Config Button Dialog (+)
+        btn_add_config.setOnClickListener(v -> showImportOptionsDialog());
+
+        // Connect / Disconnect Action
         connection.setOnClickListener(view -> {
-            sharedPreferences.edit().putString("v2ray_config", v2ray_config.getText().toString()).apply();
+            String currentConfig = v2ray_config.getText().toString();
+            if (currentConfig.isEmpty()) {
+                Toast.makeText(this, "Please import a config first!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            sharedPreferences.edit().putString("v2ray_config", currentConfig).apply();
             if (V2rayController.getConnectionState() == V2rayConstants.CONNECTION_STATES.DISCONNECTED) {
-                V2rayController.startV2ray(this, "Test Server", v2ray_config.getText().toString(), null);
+                V2rayController.startV2ray(this, "V2ray Server", currentConfig, null);
             } else {
                 V2rayController.stopV2ray(this);
             }
         });
 
-
-        // Check the connection delay of connected config.
+        // Connected server delay check
         connected_server_delay.setOnClickListener(view -> {
-            connected_server_delay.setText("connected server delay : measuring...");
-            // Don`t forget to do ui jobs in ui thread!
-            V2rayController.getConnectedV2rayServerDelay(this, delayResult -> runOnUiThread(() -> connected_server_delay.setText("connected server delay : " + delayResult + "ms")));
+            connected_server_delay.setText("delay : measuring...");
+            V2rayController.getConnectedV2rayServerDelay(this, delayResult -> runOnUiThread(() -> connected_server_delay.setText("delay : " + delayResult + "ms")));
         });
-        // Another way to check the connection delay of a config without connecting to it.
+
+        // Server delay ping test button
         server_delay.setOnClickListener(view -> {
-            server_delay.setText("server delay : measuring...");
-            new Handler().postDelayed(() -> server_delay.setText("server delay : " + V2rayController.getV2rayServerDelay(v2ray_config.getText().toString()) + "ms"), 200);
+            String cfg = v2ray_config.getText().toString();
+            if (cfg.isEmpty()) {
+                Toast.makeText(this, "No config to test!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            server_delay.setText("Testing...");
+            new Handler().postDelayed(() -> server_delay.setText(V2rayController.getV2rayServerDelay(cfg) + "ms"), 200);
         });
 
         connection_mode.setOnClickListener(view -> {
@@ -90,41 +117,37 @@ public class MainActivity extends AppCompatActivity {
         // Check connection state when activity launch
         switch (V2rayController.getConnectionState()) {
             case CONNECTED:
-                connection.setText("CONNECTED");
-                // check  connection latency
+                connection.setText("■");
                 connected_server_delay.callOnClick();
                 break;
             case DISCONNECTED:
-                connection.setText("DISCONNECTED");
+                connection.setText("▶");
                 break;
             case CONNECTING:
-                connection.setText("CONNECTING");
+                connection.setText("...");
                 break;
             default:
                 break;
         }
-        //I tested several different ways to send information from the connection process side
-        // to other places (such as interfaces, AIDL and singleton ,...) apparently the best way
-        // to send information is broadcast.
-        // So v2ray library will be broadcast information with action V2RAY_CONNECTION_INFO.
+
         v2rayBroadCastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 runOnUiThread(() -> {
-                    connection_time.setText("connection time : " + Objects.requireNonNull(intent.getExtras()).getString(SERVICE_DURATION_BROADCAST_EXTRA));
-                    connection_speed.setText("connection speed : " + intent.getExtras().getString(SERVICE_UPLOAD_SPEED_BROADCAST_EXTRA) + " | " + intent.getExtras().getString(SERVICE_DOWNLOAD_SPEED_BROADCAST_EXTRA));
-                    connection_traffic.setText("connection traffic : " + intent.getExtras().getString(SERVICE_UPLOAD_TRAFFIC_BROADCAST_EXTRA) + " | " + intent.getExtras().getString(SERVICE_DOWNLOAD_TRAFFIC_BROADCAST_EXTRA));
+                    connection_time.setText("time: " + Objects.requireNonNull(intent.getExtras()).getString(SERVICE_DURATION_BROADCAST_EXTRA));
+                    connection_speed.setText(intent.getExtras().getString(SERVICE_UPLOAD_SPEED_BROADCAST_EXTRA) + " | " + intent.getExtras().getString(SERVICE_DOWNLOAD_SPEED_BROADCAST_EXTRA));
+                    connection_traffic.setText("traffic: " + intent.getExtras().getString(SERVICE_UPLOAD_TRAFFIC_BROADCAST_EXTRA) + " | " + intent.getExtras().getString(SERVICE_DOWNLOAD_TRAFFIC_BROADCAST_EXTRA));
                     connection_mode.setText("connection mode : " + V2rayConfigs.serviceMode.toString());
                     switch ((V2rayConstants.CONNECTION_STATES) Objects.requireNonNull(intent.getExtras().getSerializable(SERVICE_CONNECTION_STATE_BROADCAST_EXTRA))) {
                         case CONNECTED:
-                            connection.setText("CONNECTED");
+                            connection.setText("■");
                             break;
                         case DISCONNECTED:
-                            connection.setText("DISCONNECTED");
-                            connected_server_delay.setText("connected server delay : wait for connection");
+                            connection.setText("▶");
+                            connected_server_delay.setText("connected server delay : wait");
                             break;
                         case CONNECTING:
-                            connection.setText("CONNECTING");
+                            connection.setText("...");
                             break;
                         default:
                             break;
@@ -140,15 +163,72 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void showImportOptionsDialog() {
+        String[] options = {"Import from Clipboard", "Manually Type"};
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Add Configuration");
+        builder.setItems(options, (dialog, which) -> {
+            if (which == 0) {
+                importFromClipboard();
+            } else if (which == 1) {
+                showManualInputDialog();
+            }
+        });
+        builder.show();
+    }
+
+    private void importFromClipboard() {
+        ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+        if (clipboard != null && clipboard.hasPrimaryClip()) {
+            ClipData clipData = clipboard.getPrimaryClip();
+            if (clipData != null && clipData.getItemCount() > 0) {
+                CharSequence text = clipData.getItemAt(0).getText();
+                if (text != null) {
+                    String pastedConfig = text.toString().trim();
+                    v2ray_config.setText(pastedConfig);
+                    sharedPreferences.edit().putString("v2ray_config", pastedConfig).apply();
+                    config_preview_text.setText(pastedConfig.length() > 40 ? pastedConfig.substring(0, 40) + "..." : pastedConfig);
+                    Toast.makeText(this, "Config Imported from Clipboard!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+            }
+        }
+        Toast.makeText(this, "Clipboard is empty!", Toast.LENGTH_SHORT).show();
+    }
+
+    private void showManualInputDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Manual Config Input");
+
+        final EditText input = new EditText(this);
+        input.setHint("Paste vmess:// or vless:// link here");
+        input.setMinLines(4);
+        builder.setView(input);
+
+        builder.setPositiveButton("Save", (dialog, which) -> {
+            String manualConfig = input.getText().toString().trim();
+            if (!manualConfig.isEmpty()) {
+                v2ray_config.setText(manualConfig);
+                sharedPreferences.edit().putString("v2ray_config", manualConfig).apply();
+                config_preview_text.setText(manualConfig.length() > 40 ? manualConfig.substring(0, 40) + "..." : manualConfig);
+                Toast.makeText(this, "Config Saved Successfully!", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "Config cannot be empty!", Toast.LENGTH_SHORT).show();
+            }
+        });
+        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
+
+        builder.show();
+    }
+
     public static String getDefaultConfig() {
         return "";
     }
 
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (v2rayBroadCastReceiver != null){
+        if (v2rayBroadCastReceiver != null) {
             unregisterReceiver(v2rayBroadCastReceiver);
         }
     }
