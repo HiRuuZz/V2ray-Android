@@ -21,9 +21,9 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Configuration file"
-            android:textColor="#FFFFFF"
-            android:textSize="18sp"
+            android:text="Ruu VPN"
+            android:textColor="#00E5FF"
+            android:textSize="20sp"
             android:textStyle="bold" />
 
         <!-- Add Config Button (+) -->
@@ -54,13 +54,13 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Saved Configs"
+            android:text="Saved Configs List"
             android:textColor="#00E5FF"
             android:textSize="13sp"
             android:textStyle="bold" />
     </LinearLayout>
 
-    <!-- Hidden EditText (Required for backend logic) -->
+    <!-- Hidden EditText -->
     <EditText
         android:id="@+id/v2ray_config"
         android:layout_width="match_parent"
@@ -106,7 +106,7 @@
                     android:id="@+id/connection_mode"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="connection mode : VPN_TUN"
+                    android:text="connection mode : VPN_MODE"
                     android:textColor="#FFFFFF"
                     android:textSize="13sp"
                     android:textStyle="bold" />
@@ -123,7 +123,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="connected server delay : wait"
+                        android:text="delay : wait"
                         android:textColor="#AAAAAA"
                         android:textSize="12sp" />
 
@@ -172,41 +172,12 @@
                     android:textSize="11sp" />
             </LinearLayout>
 
-            <!-- Config List Display Card -->
+            <!-- Container for Dynamic Config List Items -->
             <LinearLayout
+                android:id="@+id/config_list_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="#1E1E1E"
-                android:orientation="vertical"
-                android:padding="12dp"
-                android:layout_marginBottom="10dp">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Imported Configuration"
-                    android:textColor="#FFFFFF"
-                    android:textSize="15sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/config_preview_text"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
-                    android:text="No config imported yet. Tap '+' to add."
-                    android:textColor="#AAAAAA"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="V2RAY / VMESS / VLESS"
-                    android:textColor="#FF9800"
-                    android:textSize="11sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
+                android:orientation="vertical" />
 
         </LinearLayout>
     </ScrollView>
@@ -222,9 +193,10 @@
         android:paddingHorizontal="16dp">
 
         <TextView
+            android:id="@+id/status_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Status: Ready"
+            android:text="Disconnected"
             android:textColor="#888888"
             android:textSize="13sp" />
     </LinearLayout>
