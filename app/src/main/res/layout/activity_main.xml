@@ -23,7 +23,9 @@
             android:layout_height="24dp"
             android:layout_marginEnd="16dp"
             android:src="@android:drawable/ic_menu_sort_by_size"
-            android:contentDescription="Menu" />
+            android:contentDescription="Menu"
+            android:clickable="true"
+            android:focusable="true" />
 
         <TextView
             android:layout_width="0dp"
