@@ -20,7 +20,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Gravity;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -65,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
         String network;
         String headType;
         String sni;
-        String protocol; // vmess, vless, trojan, etc.
+        String protocol;
         String content;
 
         public ConfigItem(String name, String address, String port, String uuid, String flow, String encryption, String network, String headType, String sni, String protocol, String content) {
@@ -120,7 +119,6 @@ public class MainActivity extends AppCompatActivity {
         btn_add_config.setOnClickListener(v -> showImportOptionsDialog());
         btn_menu.setOnClickListener(v -> showSideMenuDialog());
 
-        // Connect / Disconnect Action Button
         connection.setOnClickListener(view -> {
             String currentConfig = v2ray_config.getText().toString();
             if (currentConfig.isEmpty()) {
@@ -192,7 +190,8 @@ public class MainActivity extends AppCompatActivity {
         builder.setTitle("Ruu VPN Menu");
         builder.setItems(menuOptions, (dialog, which) -> {
             if (which == 0) {
-                Toast.makeText(this, "Get Free Config selected", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(MainActivity.this, WebViewActivity.class);
+                startActivity(intent);
             } else if (which == 1) {
                 new AlertDialog.Builder(this)
                     .setTitle("About us")
@@ -299,7 +298,6 @@ public class MainActivity extends AppCompatActivity {
 
             LinearLayout card = new LinearLayout(this);
             card.setOrientation(LinearLayout.VERTICAL);
-            // Highlight active/selected config card background or border look
             card.setBackgroundColor(isSelected ? 0xFF243447 : 0xFF1E1E1E);
             card.setPadding(16, 16, 16, 16);
             LinearLayout.LayoutParams cardParams = new LinearLayout.LayoutParams(
@@ -315,7 +313,6 @@ public class MainActivity extends AppCompatActivity {
 
             TextView nameView = new TextView(this);
             nameView.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
-            // Show a green dot or highlight indicator if selected
             String displayName = isSelected ? "● " + item.name : item.name;
             nameView.setText(displayName);
             nameView.setTextColor(isSelected ? 0xFF00E5FF : 0xFFFFFFFF);
@@ -323,7 +320,6 @@ public class MainActivity extends AppCompatActivity {
             nameView.setTypeface(null, android.graphics.Typeface.BOLD);
             topRow.addView(nameView);
 
-            // Share Button
             TextView btnShare = new TextView(this);
             btnShare.setText(" Share ");
             btnShare.setTextColor(0xFF00E5FF);
@@ -337,7 +333,6 @@ public class MainActivity extends AppCompatActivity {
             });
             topRow.addView(btnShare);
 
-            // Edit Button
             TextView btnEdit = new TextView(this);
             btnEdit.setText(" Edit ");
             btnEdit.setTextColor(0xFFFF9800);
@@ -346,7 +341,6 @@ public class MainActivity extends AppCompatActivity {
             btnEdit.setOnClickListener(v -> showEditConfigDialog(index));
             topRow.addView(btnEdit);
 
-            // Delete Button with Confirm Dialog
             TextView btnDelete = new TextView(this);
             btnDelete.setText(" Del ");
             btnDelete.setTextColor(0xFFFF5252);
@@ -374,7 +368,6 @@ public class MainActivity extends AppCompatActivity {
 
             card.addView(topRow);
 
-            // Details and Protocol type row
             LinearLayout infoRow = new LinearLayout(this);
             infoRow.setOrientation(LinearLayout.HORIZONTAL);
             infoRow.setGravity(Gravity.CENTER_VERTICAL);
@@ -387,7 +380,6 @@ public class MainActivity extends AppCompatActivity {
             previewView.setTextSize(11);
             infoRow.addView(previewView);
 
-            // Protocol Type View (VMESS, VLESS, TROJAN, etc.)
             TextView protocolView = new TextView(this);
             protocolView.setText(item.protocol.toUpperCase());
             protocolView.setTextColor(0xFFFF9800);
